@@ -1,0 +1,149 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum KategoriPelanggaran {
+  RINGAN
+  SEDANG
+  BERAT
+}
+
+enum StatusKasus {
+  BARU
+  PROSES
+  SELESAI
+}
+
+enum RoleGuru {
+  ADMIN
+  GURU_BK
+}
+
+enum JenisKelamin {
+  L
+  P
+}
+
+model Siswa {
+  id              String             @id @default(uuid())
+  nama            String
+  nis             String             @unique
+  kelas           String
+  jenisKelamin    JenisKelamin
+  fotoUrl         String?
+  namaWali        String
+  kontakWali      String
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  pelanggaran     PelanggaranSiswa[]
+  kasusUtama      Kasus[]            @relation("KasusSiswaUtama")
+  kasusTerlibat   KasusPihakTerlibat[]
+
+  @@index([kelas])
+  @@index([nama])
+}
+
+model JenisPelanggaran {
+  id               String               @id @default(uuid())
+  namaPelanggaran  String
+  kategori         KategoriPelanggaran
+  poin             Int
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  pelanggaranSiswa PelanggaranSiswa[]
+}
+
+model PelanggaranSiswa {
+  id                 String           @id @default(uuid())
+  siswaId            String
+  jenisPelanggaranId String
+  dicatatOlehId      String
+  tanggal            DateTime         @default(now())
+  keteranganTambahan String?          @db.Text
+  poinSaatItu        Int
+  createdAt          DateTime         @default(now())
+
+  siswa              Siswa            @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+  jenisPelanggaran   JenisPelanggaran @relation(fields: [jenisPelanggaranId], references: [id], onDelete: Restrict)
+  dicatatOleh        GuruBk           @relation(fields: [dicatatOlehId], references: [id], onDelete: Restrict)
+
+  @@index([siswaId])
+  @@index([tanggal])
+}
+
+model Kasus {
+  id                 String               @id @default(uuid())
+  siswaUtamaId       String
+  dicatatOlehId      String
+  judulKasus         String
+  deskripsiLengkap   String               @db.Text
+  tanggalKejadian    DateTime
+  status             StatusKasus          @default(BARU)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  siswaUtama         Siswa                @relation("KasusSiswaUtama", fields: [siswaUtamaId], references: [id], onDelete: Cascade)
+  dicatatOleh        GuruBk               @relation(fields: [dicatatOlehId], references: [id], onDelete: Restrict)
+  pihakTerlibat      KasusPihakTerlibat[]
+  tindakLanjutList   TindakLanjutKasus[]
+
+  @@index([siswaUtamaId])
+  @@index([status])
+}
+
+model KasusPihakTerlibat {
+  id        String   @id @default(uuid())
+  kasusId   String
+  siswaId   String
+  peran     String?
+  
+  kasus     Kasus    @relation(fields: [kasusId], references: [id], onDelete: Cascade)
+  siswa     Siswa    @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+
+  @@unique([kasusId, siswaId])
+}
+
+model TindakLanjutKasus {
+  id            String       @id @default(uuid())
+  kasusId       String
+  dicatatOlehId String
+  tanggal       DateTime     @default(now())
+  catatan       String       @db.Text
+  statusSetelah StatusKasus?
+  createdAt     DateTime     @default(now())
+
+  kasus         Kasus        @relation(fields: [kasusId], references: [id], onDelete: Cascade)
+  dicatatOleh   GuruBk       @relation(fields: [dicatatOlehId], references: [id], onDelete: Restrict)
+
+  @@index([kasusId])
+}
+
+model GuruBk {
+  id            String             @id @default(uuid())
+  nama          String
+  username      String             @unique
+  passwordHash  String
+  noHp          String?
+  role          RoleGuru           @default(GURU_BK)
+  isAktif       Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  pelanggaranDicatat  PelanggaranSiswa[]
+  kasusDicatat        Kasus[]
+  tindakLanjutDicatat TindakLanjutKasus[]
+}
+
+model Pengaturan {
+  key         String   @id
+  value       String
+  keterangan  String?
+  updatedAt   DateTime @updatedAt
+}

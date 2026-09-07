@@ -1,0 +1,25 @@
+{
+  "name": "Sistem BK - SMP N 6 Denpasar",
+  "short_name": "Sistem BK",
+  "description": "Sistem Manajemen Bimbingan Konseling Sekolah SMP N 6 Denpasar",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

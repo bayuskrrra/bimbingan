@@ -1,0 +1,21 @@
+{
+  "name": "sistem-guru-bk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistem Manajemen Bimbingan Konseling (BK) Sekolah",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm run build --prefix client",
+    "vercel-build": "npm run prisma:generate --prefix server && npm run build --prefix client",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
