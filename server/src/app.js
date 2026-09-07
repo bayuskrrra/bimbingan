@@ -32,6 +32,7 @@ const handleHealth = (req, res) => {
     status: 'OK',
     app: 'Sistem Informasi Bimbingan Konseling (BK)',
     time: new Date().toISOString(),
+    hasDbUrl: !!process.env.DATABASE_URL,
   });
 };
 app.get('/api/health', handleHealth);

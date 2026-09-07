@@ -11,8 +11,9 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "build": "npm run build --prefix client",
-    "vercel-build": "prisma generate --schema=server/prisma/schema.prisma && npm run build --prefix client",
+    "postinstall": "prisma generate",
+    "build": "prisma generate && npm run build --prefix client",
+    "vercel-build": "prisma generate && npm run build --prefix client",
     "install:all": "npm install"
   },
   "dependencies": {
